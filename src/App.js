@@ -14,7 +14,7 @@ function App() {
   // Main function
   const runCoco = async () => {
     // 3. TODO - Load network 
-    const net = await tf.loadGraphModel('https://livelong.s3.au-syd.cloud-object-storage.appdomain.cloud/model.json')
+    const net = await tf.loadGraphModel('https://nimrodtfpoc.s3.eu-de.cloud-object-storage.appdomain.cloud/model.json')
     
     // Loop and detect hands
     setInterval(() => {
@@ -48,17 +48,48 @@ function App() {
       const casted = resized.cast('int32')
       const expanded = casted.expandDims(0)
       const obj = await net.executeAsync(expanded)
+
+      /**
+       * Tensorflow sometime get a bit weird and changes the locations of the 
+       * boxes, classes and scores. Those objects should have the following 
+       * formats:
+       * 
+       * boxes: nested array with each inner array having four values between
+       * 0 and 1 e.g.
+       * [
+       *  [0.12, 0.6, 0.92, 1.00],
+       *  [0.77, 0.41, 0.85, .22],
+       *  [0.43, 0.13, 0.76, .22],
+       *  [0.91, 0.92, 0.21, .37]
+       * ]
+       * 
+       * classes: an array of integers e.g.
+       * [1, 4, 2, 3]
+       * 
+       * scores: sorted array with values between 0 and 1 e.g.
+       * [0.72, 0.43, 0.28, 0.21]
+       */
+
+
+      // console.log(await obj[0].array())
       
-      const boxes = await obj[4].array()
-      const classes = await obj[5].array()
-      const scores = await obj[6].array()
+      // const boxes = await obj[4].array()
+      // const classes = await obj[5].array()
+      // const scores = await obj[6].array()
+
+      const boxes = await obj[7].array()
+      const classes = await obj[2].array()
+      const scores = await obj[0].array()
     
       // Draw mesh
       const ctx = canvasRef.current.getContext("2d");
 
       // 5. TODO - Update drawing utility
       // drawSomething(obj, ctx)  
-      requestAnimationFrame(()=>{drawRect(boxes[0], classes[0], scores[0], 0.9, videoWidth, videoHeight, ctx)}); 
+      requestAnimationFrame(()=> {
+        const confidence = 0.9 // 0 between 1
+        drawRect(boxes[0], classes[0], scores[0], confidence, videoWidth, videoHeight, ctx)}
+      ); 
 
       tf.dispose(img)
       tf.dispose(resized)
@@ -69,7 +100,7 @@ function App() {
     }
   };
 
-  useEffect(()=>{runCoco()},[]);
+  useEffect(()=>{runCoco()},[runCoco]);
 
   return (
     <div className="App">

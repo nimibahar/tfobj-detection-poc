@@ -1,18 +1,20 @@
 // Define our labelmap
 const labelMap = {
-    1:{name:'ThumbsUp', color:'red'},
-    2:{name:'ThumbsDown', color:'yellow'},
-    3:{name:'ThankYou', color:'lime'},
-    4:{name:'LiveLong', color:'blue'},
+    1:{name:'DownDog', color:'red'},
+    2:{name:'Goddess', color:'yellow'},
+    // 3:{name:'ThankYou', color:'lime'},
+    // 4:{name:'LiveLong', color:'blue'},
 }
 
 // Define a drawing function
 export const drawRect = (boxes, classes, scores, threshold, imgWidth, imgHeight, ctx)=>{
+
     for(let i=0; i<=boxes.length; i++){
         if(boxes[i] && classes[i] && scores[i]>threshold){
             // Extract variables
             const [y,x,height,width] = boxes[i]
             const text = classes[i]
+            console.log({text})
             
             // Set styling
             ctx.strokeStyle = labelMap[text]['color']
