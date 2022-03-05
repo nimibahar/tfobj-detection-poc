@@ -70,7 +70,7 @@ function App() {
        * [0.72, 0.43, 0.28, 0.21]
        */
 
-
+      // DEBUG
       // console.log(await obj[0].array())
       
       // const boxes = await obj[4].array()
